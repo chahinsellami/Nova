@@ -1,8 +1,13 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Navbar from "./components/Navbar";
-import WebGLBackground from "./components/WebGLBackground";
 import { WebGLProvider, useWebGLBackground } from "./WebGLContext";
+
+const WebGLBackground = dynamic(
+  () => import("./components/WebGLBackground"),
+  { ssr: false },
+);
 
 function LayoutInner({ children }: { children: React.ReactNode }) {
   const bgRef = useWebGLBackground();

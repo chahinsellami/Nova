@@ -3,6 +3,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 
 export interface Product {
   id: string;
@@ -27,10 +28,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) => {
     >
       <Link href={`/product/${product.id}`} className="group block">
         <div className="relative overflow-hidden aspect-3/4 bg-neutral-950 mb-4">
-          <img
+          <Image
             src={product.image}
             alt={product.name}
-            className="w-full h-full object-cover transition-all duration-700 group-hover:brightness-110"
+            fill
+            sizes="(max-width: 768px) 50vw, 33vw"
+            loading="lazy"
+            className="object-cover transition-all duration-700 group-hover:brightness-110"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
         </div>

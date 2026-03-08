@@ -26,6 +26,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="preconnect" href="https://images.unsplash.com" />
+        <link rel="dns-prefetch" href="https://images.unsplash.com" />
+        <link rel="preconnect" href="https://s3-us-west-2.amazonaws.com" />
+        <link rel="dns-prefetch" href="https://s3-us-west-2.amazonaws.com" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black text-white`}
       >

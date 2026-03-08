@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import Link from "next/link";
+import Image from "next/image";
 import { useWebGLBackground } from "./WebGLContext";
 
 /* ── Data ────────────────────────────────────────────────── */
@@ -100,15 +101,18 @@ export default function Page() {
         s.initial = false;
       }
 
+      // Pre-position next slide images off-screen BEFORE making visible
+      gsap.set(nxtImgs, { yPercent: 150, scaleY: 1.5 });
+      if (nxtText.length) gsap.set(nxtText, { yPercent: 100 });
+
       // Current slide OUT
       tl.to(
         curImgs,
         {
           yPercent: -185,
           scaleY: 1.5,
-          duration: 1.5,
+          duration: 0.9,
           ease: "expo.inOut",
-          stagger: 0.075,
         },
         0,
       );
@@ -116,10 +120,10 @@ export default function Page() {
       if (curBullet) {
         const cT = curBullet.querySelector(".bullet-text");
         const cL = curBullet.querySelector(".bullet-line");
-        if (cT) tl.to(cT, { alpha: 0.25, duration: 1.5, ease: "none" }, 0);
+        if (cT) tl.to(cT, { alpha: 0.25, duration: 0.8, ease: "none" }, 0);
         if (cL) {
           tl.set(cL, { transformOrigin: "right" }, 0);
-          tl.to(cL, { scaleX: 0, duration: 1.5, ease: "expo.inOut" }, 0);
+          tl.to(cL, { scaleX: 0, duration: 0.8, ease: "expo.inOut" }, 0);
         }
       }
 
@@ -127,44 +131,38 @@ export default function Page() {
         tl.fromTo(
           curText,
           { yPercent: 0 },
-          { yPercent: -100, duration: 2, ease: "power4.inOut" },
+          { yPercent: -100, duration: 1, ease: "power4.inOut" },
           0,
         );
       }
 
-      tl.set(curSlide, { autoAlpha: 0 });
-      tl.set(nxtSlide, { autoAlpha: 1 }, 1);
+      // Swap slides — next is already pre-positioned off-screen so no flash
+      tl.set(curSlide, { autoAlpha: 0 }, 0.6);
+      tl.set(nxtSlide, { autoAlpha: 1 }, 0.6);
 
       // Next slide IN
-      if (nxtText.length) {
-        tl.fromTo(
-          nxtText,
-          { yPercent: 100 },
-          { yPercent: 0, duration: 2, ease: "power4.out" },
-          1.5,
-        );
-      }
-
-      tl.fromTo(
+      tl.to(
         nxtImgs,
-        { yPercent: 150, scaleY: 1.5 },
         {
           yPercent: 0,
           scaleY: 1,
-          duration: 1.5,
+          duration: 0.9,
           ease: "expo.inOut",
-          stagger: 0.075,
         },
-        1,
+        0.6,
       );
+
+      if (nxtText.length) {
+        tl.to(nxtText, { yPercent: 0, duration: 1, ease: "power4.out" }, 0.7);
+      }
 
       if (nxtBullet) {
         const nT = nxtBullet.querySelector(".bullet-text");
         const nL = nxtBullet.querySelector(".bullet-line");
-        if (nT) tl.to(nT, { alpha: 1, duration: 1.5, ease: "none" }, 1);
+        if (nT) tl.to(nT, { alpha: 1, duration: 0.8, ease: "none" }, 0.6);
         if (nL) {
-          tl.set(nL, { transformOrigin: "left" }, 1);
-          tl.to(nL, { scaleX: 1, duration: 1.5, ease: "expo.inOut" }, 1);
+          tl.set(nL, { transformOrigin: "left" }, 0.6);
+          tl.to(nL, { scaleX: 1, duration: 0.8, ease: "expo.inOut" }, 0.6);
         }
       }
 
@@ -205,11 +203,16 @@ export default function Page() {
     };
 
     let touchStartY = 0;
+    let touchStartTime = 0;
     const onTouchStart = (e: TouchEvent) => {
       touchStartY = e.touches[0].clientY;
+      touchStartTime = Date.now();
     };
     const onTouchEnd = (e: TouchEvent) => {
-      if (touchStartY - e.changedTouches[0].clientY > 50) nextSlide();
+      const deltaY = touchStartY - e.changedTouches[0].clientY;
+      const elapsed = Date.now() - touchStartTime;
+      // Quick flick (fast swipe) or long drag — both should trigger
+      if (deltaY > 30 || (deltaY > 15 && elapsed < 300)) nextSlide();
     };
 
     const onKeyDown = (e: KeyboardEvent) => {
@@ -246,11 +249,15 @@ export default function Page() {
           className="absolute inset-0 z-10 flex items-center"
         >
           {/* Product image */}
-          <div className="slide-img absolute overflow-hidden left-[50%] -translate-x-1/2 top-[14%] w-[55%] h-[45%] md:translate-x-0 md:left-[8%] md:top-[12%] md:w-[30%] md:h-[72%]">
-            <img
+          <div className="slide-img absolute overflow-hidden left-[50%] -translate-x-1/2 top-[14%] w-[55%] h-[45%] md:translate-x-0 md:left-[8%] md:top-[12%] md:w-[30%] md:h-[72%] will-change-transform">
+            <Image
               src={slide.product}
               alt={slide.name}
-              className="w-full h-full object-cover"
+              fill
+              sizes="(max-width: 768px) 55vw, 30vw"
+              priority={i === 0}
+              loading={i === 0 ? "eager" : "lazy"}
+              className="object-cover"
               draggable={false}
             />
             <div

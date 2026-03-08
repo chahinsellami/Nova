@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
+import gsap from "gsap";
 
 /* ── Shaders ─────────────────────────────────────────────── */
 
@@ -74,7 +75,7 @@ export default function WebGLBackground({
     /* ── Three.js setup ─────────────────────────────────── */
     const scene = new THREE.Scene();
     const renderer = new THREE.WebGLRenderer({ alpha: true });
-    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(el.offsetWidth, el.offsetHeight);
     inner.appendChild(renderer.domElement);
 
@@ -143,53 +144,55 @@ export default function WebGLBackground({
           if (animating || nextIdx === currentIdx) return;
           animating = true;
 
-          const gsapModule = import("gsap");
-          gsapModule.then(({ default: gsap }) => {
-            mat.uniforms.texture1.value = textures[currentIdx];
-            mat.uniforms.texture2.value = textures[nextIdx];
-            mat.uniforms.dispPower.value = 0;
-            render();
+          mat.uniforms.texture1.value = textures[currentIdx];
+          mat.uniforms.texture2.value = textures[nextIdx];
+          mat.uniforms.dispPower.value = 0;
+          render();
 
-            gsap.to(mat.uniforms.dispPower, {
-              value: 1,
-              duration: 2.5,
-              ease: "expo.inOut",
-              onUpdate: render,
-              onComplete: () => {
-                mat.uniforms.dispPower.value = 0;
-                mat.uniforms.texture1.value = textures[nextIdx];
-                mat.uniforms.texture2.value = textures[nextIdx];
-                render();
-                currentIdx = nextIdx;
-                animating = false;
-              },
-            });
+          gsap.to(mat.uniforms.dispPower, {
+            value: 1,
+            duration: 1.2,
+            ease: "expo.inOut",
+            onUpdate: render,
+            onComplete: () => {
+              mat.uniforms.dispPower.value = 0;
+              mat.uniforms.texture1.value = textures[nextIdx];
+              mat.uniforms.texture2.value = textures[nextIdx];
+              render();
+              currentIdx = nextIdx;
+              animating = false;
+            },
           });
         },
       };
     }
 
-    /* ── Resize ─────────────────────────────────────────── */
+    /* ── Resize (debounced) ─────────────────────────────── */
+    let resizeTimer: ReturnType<typeof setTimeout> | null = null;
     const onResize = () => {
-      if (!el) return;
-      const w = el.offsetWidth;
-      const h = el.offsetHeight;
-      renderer.setSize(w, h);
-      camera.left = w / -2;
-      camera.right = w / 2;
-      camera.top = h / 2;
-      camera.bottom = h / -2;
-      camera.updateProjectionMatrix();
-      mat.uniforms.res.value.set(w, h);
-      mesh.geometry.dispose();
-      mesh.geometry = new THREE.PlaneGeometry(w, h, 1);
-      render();
+      if (resizeTimer) clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        if (!el) return;
+        const w = el.offsetWidth;
+        const h = el.offsetHeight;
+        renderer.setSize(w, h);
+        camera.left = w / -2;
+        camera.right = w / 2;
+        camera.top = h / 2;
+        camera.bottom = h / -2;
+        camera.updateProjectionMatrix();
+        mat.uniforms.res.value.set(w, h);
+        mesh.geometry.dispose();
+        mesh.geometry = new THREE.PlaneGeometry(w, h, 1);
+        render();
+      }, 200);
     };
     window.addEventListener("resize", onResize);
 
     /* ── Cleanup ────────────────────────────────────────── */
     return () => {
       window.removeEventListener("resize", onResize);
+      if (resizeTimer) clearTimeout(resizeTimer);
       renderer.dispose();
       geometry.dispose();
       mat.dispose();
