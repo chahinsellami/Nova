@@ -245,11 +245,8 @@ export default function Page() {
           }}
           className="absolute inset-0 z-10 flex items-center"
         >
-          {/* Product image — left side */}
-          <div
-            className="slide-img absolute overflow-hidden"
-            style={{ left: "8%", top: "12%", width: "30%", height: "72%" }}
-          >
+          {/* Product image */}
+          <div className="slide-img absolute overflow-hidden left-[50%] -translate-x-1/2 top-[14%] w-[55%] h-[45%] md:translate-x-0 md:left-[8%] md:top-[12%] md:w-[30%] md:h-[72%]">
             <img
               src={slide.product}
               alt={slide.name}
@@ -265,41 +262,38 @@ export default function Page() {
             />
           </div>
 
-          {/* Product info + Buy — right side */}
-          <div
-            className="absolute z-20"
-            style={{ left: "46%", top: "50%", transform: "translateY(-50%)" }}
-          >
+          {/* Product info + Buy */}
+          <div className="absolute z-20 left-[50%] -translate-x-1/2 bottom-[6%] text-center md:text-left md:translate-x-0 md:left-[46%] md:top-[50%] md:bottom-auto md:-translate-y-1/2">
             <div className="text-line overflow-hidden">
-              <div className="text-[9px] tracking-[0.5em] text-white/25 font-light uppercase mb-4">
+              <div className="text-[8px] md:text-[9px] tracking-[0.5em] text-white/25 font-light uppercase mb-2 md:mb-4">
                 {slide.collection} &mdash; Limited Edition
               </div>
             </div>
             <div className="text-line overflow-hidden">
-              <div className="text-3xl lg:text-5xl font-extralight tracking-[0.15em] uppercase leading-tight">
+              <div className="text-xl sm:text-2xl lg:text-5xl font-extralight tracking-[0.1em] md:tracking-[0.15em] uppercase leading-tight">
                 {slide.name}
               </div>
             </div>
-            <div className="text-line overflow-hidden mt-4">
-              <div className="text-sm lg:text-base font-light text-white/40 tracking-[0.2em]">
+            <div className="text-line overflow-hidden mt-2 md:mt-4">
+              <div className="text-xs md:text-sm lg:text-base font-light text-white/40 tracking-[0.2em]">
                 {slide.price}
               </div>
             </div>
-            <div className="text-line overflow-hidden mt-10 flex gap-4">
+            <div className="text-line overflow-hidden mt-4 md:mt-10 flex gap-3 md:gap-4 justify-center md:justify-start">
               <div>
                 <Link
                   href={`/product/${slide.id}`}
-                  className="inline-block bg-white text-black px-10 py-3.5 text-[9px] tracking-[0.4em] font-medium uppercase hover:bg-white/90 transition-colors duration-300"
+                  className="inline-block bg-white text-black px-6 md:px-10 py-2.5 md:py-3.5 text-[8px] md:text-[9px] tracking-[0.4em] font-medium uppercase hover:bg-white/90 transition-colors duration-300"
                 >
                   Buy Now
                 </Link>
               </div>
             </div>
-            <div className="text-line overflow-hidden mt-4">
+            <div className="text-line overflow-hidden mt-3 md:mt-4">
               <div>
                 <Link
                   href={`/product/${slide.id}`}
-                  className="inline-block border border-white/15 px-10 py-3.5 text-[9px] tracking-[0.4em] font-light uppercase text-white/50 hover:border-white/40 hover:text-white transition-all duration-500"
+                  className="inline-block border border-white/15 px-6 md:px-10 py-2.5 md:py-3.5 text-[8px] md:text-[9px] tracking-[0.4em] font-light uppercase text-white/50 hover:border-white/40 hover:text-white transition-all duration-500"
                 >
                   View Details
                 </Link>
@@ -309,7 +303,7 @@ export default function Page() {
 
           {/* Vertical label — bottom right */}
           <div
-            className="absolute right-6 bottom-16 z-20"
+            className="absolute right-4 md:right-6 bottom-20 md:bottom-16 z-20 hidden md:block"
             style={{ writingMode: "vertical-rl" }}
           >
             {slide.label.map((line, j) => (
@@ -324,7 +318,7 @@ export default function Page() {
       ))}
 
       {/* Bullet indicators — right side */}
-      <div className="absolute right-8 top-1/2 -translate-y-1/2 z-30 flex flex-col gap-6">
+      <div className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-30 flex flex-col gap-4 md:gap-6">
         {SLIDES.map((_, i) => (
           <div
             key={i}
@@ -344,7 +338,7 @@ export default function Page() {
       {/* Scroll hint */}
       <div
         ref={scrollHintRef}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-2"
+        className="absolute bottom-3 md:bottom-8 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-2"
       >
         <span className="text-[9px] tracking-[0.4em] text-white/30 uppercase">
           Scroll
