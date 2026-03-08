@@ -69,7 +69,7 @@ export default function Page() {
     });
 
     /* ── Transition logic ───────────────────────────────── */
-    const transitionNext = () => {
+    const transition = (targetIndex: number, dir: 1 | -1) => {
       const s = state.current;
 
       // Alternate background: 0→1→0→1…
@@ -78,7 +78,7 @@ export default function Page() {
       s.bgIndex = nextBg;
 
       const curSlide = slideRefs.current[s.current];
-      const nxtSlide = slideRefs.current[s.next];
+      const nxtSlide = slideRefs.current[targetIndex];
       if (!curSlide || !nxtSlide) return;
 
       const curImgs = curSlide.querySelectorAll(".slide-img");
@@ -87,7 +87,7 @@ export default function Page() {
       const nxtText = nxtSlide.querySelectorAll(".text-line div");
 
       const curBullet = bulletRefs.current[s.current];
-      const nxtBullet = bulletRefs.current[s.next];
+      const nxtBullet = bulletRefs.current[targetIndex];
 
       const tl = gsap.timeline({ paused: true });
 
@@ -101,15 +101,15 @@ export default function Page() {
         s.initial = false;
       }
 
-      // Pre-position next slide images off-screen BEFORE making visible
-      gsap.set(nxtImgs, { yPercent: 150, scaleY: 1.5 });
-      if (nxtText.length) gsap.set(nxtText, { yPercent: 100 });
+      // Pre-position next slide off-screen (direction-aware)
+      gsap.set(nxtImgs, { yPercent: dir * 150, scaleY: 1.5 });
+      if (nxtText.length) gsap.set(nxtText, { yPercent: dir * 100 });
 
-      // Current slide OUT
+      // Current slide OUT (opposite direction)
       tl.to(
         curImgs,
         {
-          yPercent: -185,
+          yPercent: dir * -185,
           scaleY: 1.5,
           duration: 0.9,
           ease: "expo.inOut",
@@ -131,12 +131,12 @@ export default function Page() {
         tl.fromTo(
           curText,
           { yPercent: 0 },
-          { yPercent: -100, duration: 1, ease: "power4.inOut" },
+          { yPercent: dir * -100, duration: 1, ease: "power4.inOut" },
           0,
         );
       }
 
-      // Swap slides — next is already pre-positioned off-screen so no flash
+      // Swap slides
       tl.set(curSlide, { autoAlpha: 0 }, 0.6);
       tl.set(nxtSlide, { autoAlpha: 1 }, 0.6);
 
@@ -167,6 +167,8 @@ export default function Page() {
       }
 
       tl.call(() => {
+        s.current = targetIndex;
+        s.next = s.current === s.total ? 0 : s.current + 1;
         s.animating = false;
       });
 
@@ -177,9 +179,16 @@ export default function Page() {
       const s = state.current;
       if (s.animating) return;
       s.animating = true;
-      transitionNext();
-      s.current = s.current === s.total ? 0 : s.current + 1;
-      s.next = s.current === s.total ? 0 : s.current + 1;
+      const target = s.current === s.total ? 0 : s.current + 1;
+      transition(target, 1);
+    };
+
+    const prevSlide = () => {
+      const s = state.current;
+      if (s.animating) return;
+      s.animating = true;
+      const target = s.current === 0 ? s.total : s.current - 1;
+      transition(target, -1);
     };
 
     /* ── Events ─────────────────────────────────────────── */
@@ -196,8 +205,11 @@ export default function Page() {
         accDelta = 0;
       }, 150);
 
-      if (Math.abs(accDelta) >= 50) {
+      if (accDelta >= 50) {
         nextSlide();
+        accDelta = 0;
+      } else if (accDelta <= -50) {
+        prevSlide();
         accDelta = 0;
       }
     };
@@ -211,12 +223,16 @@ export default function Page() {
     const onTouchEnd = (e: TouchEvent) => {
       const deltaY = touchStartY - e.changedTouches[0].clientY;
       const elapsed = Date.now() - touchStartTime;
-      // Quick flick (fast swipe) or long drag — both should trigger
-      if (deltaY > 30 || (deltaY > 15 && elapsed < 300)) nextSlide();
+      if (deltaY > 30 || (deltaY > 15 && elapsed < 300)) {
+        nextSlide();
+      } else if (deltaY < -30 || (deltaY < -15 && elapsed < 300)) {
+        prevSlide();
+      }
     };
 
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "ArrowDown" || e.key === "ArrowRight") nextSlide();
+      if (e.key === "ArrowUp" || e.key === "ArrowLeft") prevSlide();
     };
 
     window.addEventListener("wheel", onWheel, { passive: false });
@@ -237,7 +253,7 @@ export default function Page() {
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-screen overflow-hidden select-none"
+      className="relative w-full h-screen overflow-hidden select-none touch-none"
     >
       {/* ── Slides ── */}
       {SLIDES.map((slide, i) => (
