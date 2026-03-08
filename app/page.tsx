@@ -102,17 +102,18 @@ export default function Page() {
       }
 
       // Pre-position next slide off-screen (direction-aware)
-      gsap.set(nxtImgs, { yPercent: dir * 150, scaleY: 1.5 });
+      gsap.set(nxtImgs, { yPercent: dir * 120, scaleY: 1.3, force3d: true });
       if (nxtText.length) gsap.set(nxtText, { yPercent: dir * 100 });
 
       // Current slide OUT (opposite direction)
       tl.to(
         curImgs,
         {
-          yPercent: dir * -185,
-          scaleY: 1.5,
-          duration: 0.9,
-          ease: "expo.inOut",
+          yPercent: dir * -120,
+          scaleY: 1.3,
+          duration: 0.7,
+          ease: "power3.inOut",
+          force3d: true,
         },
         0,
       );
@@ -120,10 +121,10 @@ export default function Page() {
       if (curBullet) {
         const cT = curBullet.querySelector(".bullet-text");
         const cL = curBullet.querySelector(".bullet-line");
-        if (cT) tl.to(cT, { alpha: 0.25, duration: 0.8, ease: "none" }, 0);
+        if (cT) tl.to(cT, { alpha: 0.25, duration: 0.5, ease: "none" }, 0);
         if (cL) {
           tl.set(cL, { transformOrigin: "right" }, 0);
-          tl.to(cL, { scaleX: 0, duration: 0.8, ease: "expo.inOut" }, 0);
+          tl.to(cL, { scaleX: 0, duration: 0.5, ease: "power3.inOut" }, 0);
         }
       }
 
@@ -131,38 +132,39 @@ export default function Page() {
         tl.fromTo(
           curText,
           { yPercent: 0 },
-          { yPercent: dir * -100, duration: 1, ease: "power4.inOut" },
+          { yPercent: dir * -100, duration: 0.6, ease: "power3.inOut" },
           0,
         );
       }
 
-      // Swap slides
-      tl.set(curSlide, { autoAlpha: 0 }, 0.6);
-      tl.set(nxtSlide, { autoAlpha: 1 }, 0.6);
+      // Swap slides — tighter overlap so no visible gap
+      tl.set(curSlide, { autoAlpha: 0 }, 0.3);
+      tl.set(nxtSlide, { autoAlpha: 1 }, 0.3);
 
-      // Next slide IN
+      // Next slide IN — starts earlier, overlaps with outgoing
       tl.to(
         nxtImgs,
         {
           yPercent: 0,
           scaleY: 1,
-          duration: 0.9,
-          ease: "expo.inOut",
+          duration: 0.7,
+          ease: "power3.out",
+          force3d: true,
         },
-        0.6,
+        0.3,
       );
 
       if (nxtText.length) {
-        tl.to(nxtText, { yPercent: 0, duration: 1, ease: "power4.out" }, 0.7);
+        tl.to(nxtText, { yPercent: 0, duration: 0.6, ease: "power3.out" }, 0.4);
       }
 
       if (nxtBullet) {
         const nT = nxtBullet.querySelector(".bullet-text");
         const nL = nxtBullet.querySelector(".bullet-line");
-        if (nT) tl.to(nT, { alpha: 1, duration: 0.8, ease: "none" }, 0.6);
+        if (nT) tl.to(nT, { alpha: 1, duration: 0.5, ease: "none" }, 0.3);
         if (nL) {
-          tl.set(nL, { transformOrigin: "left" }, 0.6);
-          tl.to(nL, { scaleX: 1, duration: 0.8, ease: "expo.inOut" }, 0.6);
+          tl.set(nL, { transformOrigin: "left" }, 0.3);
+          tl.to(nL, { scaleX: 1, duration: 0.5, ease: "power3.inOut" }, 0.3);
         }
       }
 
