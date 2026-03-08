@@ -1,0 +1,612 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3D Scene with Bloom Effect</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        background: #000;
+        color: #fff;
+        overflow-x: hidden;
+      }
+
+      canvas.webgl {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+      }
+
+      #preloader {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1000;
+      }
+
+      #loading-text {
+        font-size: 3rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+      }
+
+      .banner-section {
+        position: relative;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+        background: linear-gradient(
+          to bottom,
+          rgba(0, 0, 0, 0.5),
+          rgba(0, 0, 0, 0.8)
+        );
+      }
+
+      .banner-section h1 {
+        font-size: 4rem;
+        text-align: center;
+        max-width: 90%;
+        line-height: 1.2;
+      }
+
+      .images-container {
+        position: relative;
+        z-index: 10;
+        padding: 100px 20px;
+        background: #1a1a1a;
+      }
+
+      .img {
+        width: 100%;
+        max-width: 300px;
+        margin: 50px auto;
+        display: block;
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
+      .img-main {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+
+      section {
+        position: relative;
+        z-index: 10;
+        min-height: 100vh;
+        padding: 100px 20px;
+        background: #1a1a1a;
+        text-align: center;
+      }
+
+      section h2 {
+        font-size: 2.5rem;
+        margin-bottom: 2rem;
+      }
+
+      section p {
+        font-size: 1.1rem;
+        line-height: 1.6;
+        max-width: 800px;
+        margin: 0 auto;
+        color: #ccc;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas class="webgl"></canvas>
+
+    <div id="preloader">
+      <div id="loading-text">LOADING</div>
+    </div>
+
+    <section class="banner-section">
+      <h1>Welcome to the 3D Experience</h1>
+    </section>
+
+    <div class="images-container">
+      <img
+        src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&h=400&fit=crop"
+        alt="Gallery 1"
+        class="img img-main"
+      />
+      <img
+        src="https://images.unsplash.com/photo-1506157786151-b8491531f063?w=400&h=400&fit=crop"
+        alt="Gallery 2"
+        class="img img-main"
+      />
+      <img
+        src="https://images.unsplash.com/photo-1505228395891-9a51e7e86e81?w=400&h=400&fit=crop"
+        alt="Gallery 3"
+        class="img img-main"
+      />
+      <img
+        src="https://images.unsplash.com/photo-1499887142886-fd1cac2c4d4d?w=400&h=400&fit=crop"
+        alt="Gallery 4"
+        class="img img-main"
+      />
+    </div>
+
+    <section>
+      <h2>Experience the Journey</h2>
+      <p>
+        Scroll down to see the 3D scene interact with your scrolling. The scene
+        features advanced lighting, bloom effects, and GLTF model support with
+        full dat.GUI controls.
+      </p>
+    </section>
+
+    <section>
+      <h2>Advanced Features</h2>
+      <p>
+        This scene includes: OrbitControls, GLTF loading, post-processing bloom
+        effects, multiple light sources, shadow mapping, and fully customizable
+        parameters through the GUI panel on the right.
+      </p>
+    </section>
+
+    <script src="https://unpkg.com/three@0.161.0/build/three.min.js"></script>
+    <script src="https://unpkg.com/three@0.161.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://unpkg.com/three@0.161.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://unpkg.com/dat.gui@0.7.9/build/dat.gui.min.js"></script>
+    <script src="https://unpkg.com/three@0.161.0/examples/js/postprocessing/EffectComposer.js"></script>
+    <script src="https://unpkg.com/three@0.161.0/examples/js/postprocessing/RenderPass.js"></script>
+    <script src="https://unpkg.com/three@0.161.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/SplitText.min.js"></script>
+
+    <script>
+      // Create a scene
+      const scene = new THREE.Scene();
+      const canvas = document.querySelector("canvas.webgl");
+
+      // Group for torus and model
+      const group = new THREE.Group();
+      scene.add(group);
+
+      // Torus with emissive material
+      const geometry = new THREE.TorusGeometry(0.2, 0.04, 4, 20);
+      const material = new THREE.MeshStandardMaterial({
+        color: 0x2555fd,
+        emissive: 0x2555fd,
+        emissiveIntensity: 5,
+        wireframe: true,
+      });
+      const torus = new THREE.Mesh(geometry, material);
+      torus.position.set(0, 1.8, 0);
+      group.add(torus);
+
+      const BLOOM_LAYER = 1;
+      torus.layers.enable(BLOOM_LAYER);
+
+      // Lights
+      const torusLight = new THREE.PointLight(0xffffff, 0.01, 0.25, 0.0004);
+      torusLight.position.set(0, 1.8, -2);
+      scene.add(torusLight);
+
+      const torusLightHelper = new THREE.PointLightHelper(torusLight);
+
+      const spotLight = new THREE.SpotLight(0xffffff, 17, 100, 10, 10);
+      spotLight.position.set(0, 3, 0.5);
+      spotLight.castShadow = true;
+      scene.add(spotLight);
+
+      const spotLightHelper = new THREE.SpotLightHelper(spotLight);
+
+      const fillLight = new THREE.PointLight(0x5599ff, 30, 5, 2);
+      fillLight.position.set(-2, 2, 2);
+
+      const rimLight = new THREE.PointLight(0xffffff, 20, 1, 1.5);
+      rimLight.position.set(1, 1, 1);
+      scene.add(rimLight);
+
+      const fillLightHelper = new THREE.PointLightHelper(fillLight);
+      const rimLightHelper = new THREE.PointLightHelper(rimLight);
+
+      // GLTF Loader
+      const gltfLoader = new THREE.GLTFLoader();
+      const loadModel = (path, position, rotation = { x: 0, y: 0, z: 0 }) => {
+        gltfLoader.load(
+          path,
+          (gltf) => {
+            const mesh = gltf.scene;
+            mesh.traverse((child) => {
+              if (child.isMesh) {
+                child.castShadow = true;
+                child.receiveShadow = true;
+              }
+            });
+            mesh.position.set(position.x, position.y, position.z);
+            mesh.rotation.set(rotation.x, rotation.y, rotation.z);
+            group.add(mesh);
+            console.log(gltf.scene);
+
+            const loaderEl = document.getElementById("preloader");
+            if (loaderEl) {
+              gsap.to(loaderEl, {
+                scale: 1.5,
+                opacity: 0,
+                duration: 0.5,
+                ease: "linear",
+                onComplete: () => loaderEl.remove(),
+              });
+            }
+          },
+          (xhr) => {
+            const percent = (xhr.loaded / xhr.total) * 100;
+            console.log(`Loading model: ${percent.toFixed(0)}%`);
+          },
+          (error) => {
+            console.error("Error loading model", error);
+            const loaderEl = document.getElementById("preloader");
+            if (loaderEl) loaderEl.remove();
+          },
+        );
+      };
+
+      loadModel(
+        "https://raw.githubusercontent.com/Sabur-Ahemad/roman-godess-3d/main/flora/scene.gltf",
+        { x: 0, y: 10.8, z: -15 },
+      );
+
+      // Sizes
+      const sizes = { width: window.innerWidth, height: window.innerHeight };
+
+      // Camera
+      const camera = new THREE.PerspectiveCamera(
+        75,
+        sizes.width / sizes.height,
+      );
+      camera.position.set(0, 2, 2);
+      scene.add(camera);
+
+      // Renderer
+      const renderer = new THREE.WebGLRenderer({
+        canvas: canvas,
+        antialias: true,
+      });
+      renderer.shadowMap.enabled = true;
+      renderer.setSize(sizes.width, sizes.height);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+      // Scroll-based rotation
+      gsap.registerPlugin(ScrollTrigger);
+
+      gsap.to(group.rotation, {
+        y: "+=6.28",
+        scrollTrigger: {
+          trigger: "body",
+          start: "top top",
+          end: "bottom bottom",
+          scrub: 1,
+        },
+      });
+
+      gsap.to(camera.position, {
+        y: 1,
+        z: 1.7,
+        scrollTrigger: {
+          trigger: "body",
+          start: "top top",
+          end: "bottom bottom",
+          scrub: 1,
+        },
+      });
+
+      // Post-processing
+      const composer = new THREE.EffectComposer(renderer);
+      composer.setSize(sizes.width, sizes.height);
+      composer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+      const renderPass = new THREE.RenderPass(scene, camera);
+      composer.addPass(renderPass);
+
+      const bloomPass = new THREE.UnrealBloomPass(
+        new THREE.Vector2(sizes.width, sizes.height),
+        1,
+        1.0,
+        0,
+      );
+      composer.addPass(bloomPass);
+
+      // dat.GUI Setup
+      const gui = new dat.GUI({ width: 350 });
+
+      // Torus Controls
+      const torusFolder = gui.addFolder("Torus");
+      torusFolder.add(torus.position, "x", -5, 5, 0.1).name("Position X");
+      torusFolder.add(torus.position, "y", -5, 5, 0.1).name("Position Y");
+      torusFolder.add(torus.position, "z", -5, 5, 0.1).name("Position Z");
+      torusFolder
+        .add(torus.rotation, "x", 0, Math.PI * 2, 0.1)
+        .name("Rotation X");
+      torusFolder
+        .add(torus.rotation, "y", 0, Math.PI * 2, 0.1)
+        .name("Rotation Y");
+      torusFolder
+        .add(torus.rotation, "z", 0, Math.PI * 2, 0.1)
+        .name("Rotation Z");
+      torusFolder
+        .add(material, "emissiveIntensity", 0, 10, 0.1)
+        .name("Emissive Intensity");
+      torusFolder
+        .addColor({ color: "#2555FD" }, "color")
+        .onChange((value) => {
+          material.color.set(value);
+          material.emissive.set(value);
+        })
+        .name("Color");
+
+      // Camera Controls
+      const cameraFolder = gui.addFolder("Camera");
+      cameraFolder.add(camera.position, "x", -10, 10, 0.1).name("Position X");
+      cameraFolder.add(camera.position, "y", -10, 10, 0.1).name("Position Y");
+      cameraFolder.add(camera.position, "z", -10, 10, 0.1).name("Position Z");
+      cameraFolder
+        .add(camera, "fov", 10, 150, 1)
+        .onChange(() => {
+          camera.updateProjectionMatrix();
+        })
+        .name("Field of View");
+
+      // Torus Light Controls
+      const torusLightFolder = gui.addFolder("Torus Light");
+      torusLightFolder
+        .add(torusLight.position, "x", -5, 5, 0.1)
+        .name("Position X");
+      torusLightFolder
+        .add(torusLight.position, "y", -5, 5, 0.1)
+        .name("Position Y");
+      torusLightFolder
+        .add(torusLight.position, "z", -5, 5, 0.1)
+        .name("Position Z");
+      torusLightFolder
+        .add(torusLight, "intensity", 0, 200, 1)
+        .name("Intensity");
+      torusLightFolder.add(torusLight, "distance", 0, 10, 0.1).name("Distance");
+      torusLightFolder.add(torusLight, "decay", 0, 5, 0.1).name("Decay");
+
+      // Spot Light Controls
+      const spotLightFolder = gui.addFolder("Spot Light");
+      spotLightFolder
+        .add(spotLight.position, "x", -10, 10, 0.1)
+        .name("Position X");
+      spotLightFolder
+        .add(spotLight.position, "y", -10, 10, 0.1)
+        .name("Position Y");
+      spotLightFolder
+        .add(spotLight.position, "z", -10, 10, 0.1)
+        .name("Position Z");
+      spotLightFolder.add(spotLight, "intensity", 0, 50, 1).name("Intensity");
+      spotLightFolder.add(spotLight, "distance", 0, 200, 1).name("Distance");
+      spotLightFolder
+        .add(spotLight, "angle", 0, Math.PI / 2, 0.01)
+        .name("Angle");
+      spotLightFolder.add(spotLight, "penumbra", 0, 1, 0.01).name("Penumbra");
+
+      // Rim Light Controls
+      const rimLightFolder = gui.addFolder("Rim Light");
+      rimLightFolder
+        .add(rimLight.position, "x", -10, 10, 0.1)
+        .name("Position X");
+      rimLightFolder
+        .add(rimLight.position, "y", -10, 10, 0.1)
+        .name("Position Y");
+      rimLightFolder
+        .add(rimLight.position, "z", -10, 10, 0.1)
+        .name("Position Z");
+      rimLightFolder.add(rimLight, "intensity", 0, 50, 1).name("Intensity");
+      rimLightFolder.add(rimLight, "distance", 0, 10, 0.1).name("Distance");
+      rimLightFolder.add(rimLight, "decay", 0, 5, 0.1).name("Decay");
+
+      // Bloom Effect Controls
+      const bloomFolder = gui.addFolder("Bloom Effect");
+      bloomFolder.add(bloomPass, "strength", 0, 3, 0.01).name("Strength");
+      bloomFolder.add(bloomPass, "radius", 0, 2, 0.01).name("Radius");
+      bloomFolder.add(bloomPass, "threshold", 0, 1, 0.01).name("Threshold");
+
+      // Animation Controls
+      const animationParams = {
+        flickerSpeed: 0.02,
+        flickerIntensity: 10,
+        autoRotation: true,
+        rotationSpeed: 1,
+      };
+
+      const animationFolder = gui.addFolder("Animation");
+      animationFolder
+        .add(animationParams, "flickerSpeed", 0, 0.1, 0.001)
+        .name("Flicker Speed");
+      animationFolder
+        .add(animationParams, "flickerIntensity", 0, 50, 1)
+        .name("Flicker Intensity");
+      animationFolder
+        .add(animationParams, "autoRotation")
+        .name("Auto Rotation");
+      animationFolder
+        .add(animationParams, "rotationSpeed", 0, 5, 0.1)
+        .name("Rotation Speed");
+
+      // Group Controls
+      const groupFolder = gui.addFolder("Group Transform");
+      groupFolder.add(group.position, "x", -10, 10, 0.1).name("Position X");
+      groupFolder.add(group.position, "y", -10, 10, 0.1).name("Position Y");
+      groupFolder.add(group.position, "z", -10, 10, 0.1).name("Position Z");
+      groupFolder
+        .add(group.rotation, "x", 0, Math.PI * 2, 0.1)
+        .name("Rotation X");
+      groupFolder
+        .add(group.rotation, "y", 0, Math.PI * 2, 0.1)
+        .name("Rotation Y");
+      groupFolder
+        .add(group.rotation, "z", 0, Math.PI * 2, 0.1)
+        .name("Rotation Z");
+
+      gui.close();
+
+      // Scene Controls
+      const sceneFolder = gui.addFolder("Scene");
+      sceneFolder
+        .addColor({ backgroundColor: "#000000" }, "backgroundColor")
+        .onChange((value) => {
+          scene.background = new THREE.Color(value);
+        })
+        .name("Background Color");
+
+      // Renderer Controls
+      const rendererFolder = gui.addFolder("Renderer");
+      rendererFolder
+        .add(renderer, "toneMappingExposure", 0, 3, 0.01)
+        .name("Exposure");
+
+      // Helpers
+      const helpersFolder = gui.addFolder("Helpers");
+
+      const helperControls = {
+        showTorusLightHelper: false,
+        showSpotLightHelper: false,
+        showRimLightHelper: false,
+        showFillLightHelper: false,
+      };
+
+      helpersFolder
+        .add(helperControls, "showTorusLightHelper")
+        .onChange((value) => {
+          if (value) {
+            scene.add(torusLightHelper);
+          } else {
+            scene.remove(torusLightHelper);
+          }
+        })
+        .name("Torus Light Helper");
+
+      helpersFolder
+        .add(helperControls, "showSpotLightHelper")
+        .onChange((value) => {
+          if (value) {
+            scene.add(spotLightHelper);
+          } else {
+            scene.remove(spotLightHelper);
+          }
+        })
+        .name("Spot Light Helper");
+
+      helpersFolder
+        .add(helperControls, "showRimLightHelper")
+        .onChange((value) => {
+          if (value) {
+            scene.add(rimLightHelper);
+          } else {
+            scene.remove(rimLightHelper);
+          }
+        })
+        .name("Rim Light Helper");
+
+      helpersFolder
+        .add(helperControls, "showFillLightHelper")
+        .onChange((value) => {
+          if (value) {
+            scene.add(fillLightHelper);
+          } else {
+            scene.remove(fillLightHelper);
+          }
+        })
+        .name("Fill Light Helper");
+
+      // Resize handler
+      window.addEventListener("resize", () => {
+        sizes.width = window.innerWidth;
+        sizes.height = window.innerHeight;
+
+        camera.aspect = sizes.width / sizes.height;
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(sizes.width, sizes.height);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        composer.setSize(sizes.width, sizes.height);
+        composer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      });
+
+      // Animation loop
+      let time = 0;
+      const tick = () => {
+        time += animationParams.flickerSpeed;
+
+        torusLight.intensity =
+          torusLight.intensity +
+          Math.sin(time) * animationParams.flickerIntensity;
+
+        if (animationParams.autoRotation) {
+          torus.rotation.z += 0.01 * animationParams.rotationSpeed;
+        }
+
+        renderer.render(scene, camera);
+        composer.render();
+        window.requestAnimationFrame(tick);
+      };
+      tick();
+
+      // Image parallax effects
+      const images = document.querySelectorAll(".images-container .img-main");
+
+      images.forEach((img, index) => {
+        gsap.to(img, {
+          y: 0,
+          opacity: 1,
+          ease: "none",
+          scrollTrigger: {
+            trigger: img,
+            start: "top bottom",
+            end: "bottom bottom",
+            scrub: 1,
+          },
+        });
+      });
+
+      // Window load animations
+      window.onload = function () {
+        gsap.from(".banner-section", {
+          opacity: 0,
+          y: 50,
+          duration: 1.5,
+          ease: "power2.out",
+        });
+
+        gsap.from(".images-container .img", {
+          opacity: 0,
+          scale: 0.8,
+          stagger: 0.2,
+          duration: 1.2,
+          ease: "power2.out",
+        });
+      };
+
+      // Split text animation
+      const split = new SplitText("#loading-text", { type: "chars" });
+      gsap.to(split.chars, {
+        y: -10,
+        opacity: 0,
+        duration: 0.6,
+        yoyo: true,
+        repeat: -1,
+        stagger: 0.05,
+        ease: "sine.inOut",
+      });
+    </script>
+  </body>
+</html>
