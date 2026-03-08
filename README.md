@@ -1,36 +1,91 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NOVA — Premium Clothing Brand
+
+A modern, immersive e-commerce website for **NOVA**, a premium clothing brand specializing in high-end darkwear and leather goods.
+
+## About
+
+NOVA is a fashion-forward clothing brand that blends minimalist design with bold craftsmanship. This website serves as the brand's digital storefront, featuring an interactive product showcase with cinematic transitions and a WebGL-powered background.
+
+## Features
+
+- **Three.js Displacement Shader Background** — Full-screen WebGL background with GLSL shader-based displacement transitions between images
+- **GSAP-Powered Slide Transitions** — Smooth, cinematic product transitions triggered by scroll, touch, or keyboard
+- **Responsive Design** — Tailwind CSS layout that adapts across devices
+- **Product Showcase** — Full-screen slider highlighting leather goods with pricing and purchase links
+- **Multi-Page Store** — Separate Men's and Women's collection pages with animated product grids
+- **Dark Aesthetic** — A cohesive dark theme with film grain overlays and subtle typography
+
+## Tech Stack
+
+| Technology          | Purpose                         |
+| ------------------- | ------------------------------- |
+| **Next.js 15**      | React framework with App Router |
+| **React 19**        | UI components                   |
+| **Three.js**        | WebGL background rendering      |
+| **GSAP**            | Animations and transitions      |
+| **Tailwind CSS v4** | Styling                         |
+| **Framer Motion**   | Page-level animations           |
+| **TypeScript**      | Type safety                     |
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+
+- npm, yarn, pnpm, or bun
+
+### Installation
+
+```bash
+git clone https://github.com/chahinsellami/Nova.git
+cd Nova/portfolio
+npm install
+```
+
+### Development
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to view the site.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+portfolio/
+├── app/
+│   ├── page.tsx              # Home — product slider with WebGL background
+│   ├── layout.tsx            # Root layout with metadata
+│   ├── ClientLayout.tsx      # Client wrapper for WebGL + Navbar
+│   ├── WebGLContext.tsx       # React context for shared background
+│   ├── globals.css           # Global styles
+│   ├── components/
+│   │   ├── WebGLBackground.tsx  # Three.js displacement shader
+│   │   ├── Navbar.tsx           # Navigation bar
+│   │   ├── Footer.tsx           # Site footer
+│   │   └── ProductCard.tsx      # Product card component
+│   ├── mens/                 # Men's collection page
+│   ├── womens/               # Women's collection page
+│   ├── cart/                 # Shopping cart
+│   ├── collections/          # Collections page
+│   └── data/
+│       └── products.ts       # Product data
+└── public/
+    ├── redlether.png         # Product image
+    └── blacklether.png       # Product image
+```
 
-## Learn More
+## Deployment
 
-To learn more about Next.js, take a look at the following resources:
+Deploy easily on [Vercel](https://vercel.com):
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run build
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Or connect the GitHub repo directly to Vercel for automatic deployments on every push.
 
-## Deploy on Vercel
+## License
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+© 2026 NOVA. All rights reserved.

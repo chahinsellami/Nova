@@ -10,18 +10,18 @@ import { useWebGLBackground } from "./WebGLContext";
 const SLIDES = [
   {
     product: "/redlether.png",
-    name: "Kyoto Black Hoodie",
+    name: "RED LETHER JACKET",
     price: "$185",
     collection: "FW26",
-    id: "kyoto-black-hoodie",
+    id: "red-leather-jacket",
     label: ["NOVA", "X KYOTO BLACK"],
   },
   {
     product: "/blacklether.png",
-    name: "Osaka Bomber Jacket",
+    name: "BLACK LETHER JACKET",
     price: "$340",
     collection: "FW26",
-    id: "osaka-bomber-jacket",
+    id: "BLACK-LETHER-JACKET",
     label: ["NOVA", "X SHADOW"],
   },
 ];
