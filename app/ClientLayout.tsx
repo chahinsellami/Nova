@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import Navbar from "./components/Navbar";
 import { WebGLProvider, useWebGLBackground } from "./WebGLContext";
+import { CartProvider } from "./CartContext";
 
 const WebGLBackground = dynamic(() => import("./components/WebGLBackground"), {
   ssr: false,
@@ -25,8 +26,10 @@ export default function ClientLayout({
   children: React.ReactNode;
 }) {
   return (
-    <WebGLProvider>
-      <LayoutInner>{children}</LayoutInner>
-    </WebGLProvider>
+    <CartProvider>
+      <WebGLProvider>
+        <LayoutInner>{children}</LayoutInner>
+      </WebGLProvider>
+    </CartProvider>
   );
 }

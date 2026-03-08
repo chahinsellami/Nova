@@ -25,18 +25,24 @@ const Footer: React.FC = () => {
             <h4 className="font-light text-sm mb-4">Shop</h4>
             <ul className="space-y-2 text-xs text-gray-400">
               <li>
-                <Link href="/mens" className="hover:text-white transition">
+                <Link
+                  href="/collection"
+                  className="hover:text-white transition"
+                >
                   Mens
                 </Link>
               </li>
               <li>
-                <Link href="/womens" className="hover:text-white transition">
+                <Link
+                  href="/collection"
+                  className="hover:text-white transition"
+                >
                   Womens
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/collections"
+                  href="/collection"
                   className="hover:text-white transition"
                 >
                   Collections

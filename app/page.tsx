@@ -12,7 +12,7 @@ const SLIDES = [
   {
     product: "/redlether.png",
     name: "RED LETHER JACKET",
-    price: "$185",
+    price: "80 DT",
     collection: "FW26",
     id: "red-leather-jacket",
     label: ["NOVA", "X KYOTO BLACK"],
@@ -20,7 +20,7 @@ const SLIDES = [
   {
     product: "/blacklether.png",
     name: "BLACK LETHER JACKET",
-    price: "$340",
+    price: "80 DT",
     collection: "FW26",
     id: "BLACK-LETHER-JACKET",
     label: ["NOVA", "X SHADOW"],
@@ -307,7 +307,7 @@ export default function Page() {
             <div className="text-line overflow-hidden mt-4 md:mt-10 flex gap-3 md:gap-4 justify-center md:justify-start">
               <div>
                 <Link
-                  href={`/product/${slide.id}`}
+                  href="/collection"
                   className="inline-block bg-white text-black px-6 md:px-10 py-2.5 md:py-3.5 text-[8px] md:text-[9px] tracking-[0.4em] font-medium uppercase hover:bg-white/90 transition-colors duration-300"
                 >
                   Buy Now
@@ -317,7 +317,7 @@ export default function Page() {
             <div className="text-line overflow-hidden mt-3 md:mt-4">
               <div>
                 <Link
-                  href={`/product/${slide.id}`}
+                  href="/collection"
                   className="inline-block border border-white/15 px-6 md:px-10 py-2.5 md:py-3.5 text-[8px] md:text-[9px] tracking-[0.4em] font-light uppercase text-white/50 hover:border-white/40 hover:text-white transition-all duration-500"
                 >
                   View Details

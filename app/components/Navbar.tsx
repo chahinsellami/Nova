@@ -2,9 +2,11 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { useCart } from "../CartContext";
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { totalItems } = useCart();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50">
@@ -13,22 +15,10 @@ const Navbar: React.FC = () => {
           {/* Left */}
           <div className="hidden md:flex gap-10 text-[11px] font-light tracking-[0.15em] uppercase">
             <Link
-              href="/mens"
+              href="/collection"
               className="text-white/50 hover:text-white transition-colors duration-500"
             >
-              Mens
-            </Link>
-            <Link
-              href="/womens"
-              className="text-white/50 hover:text-white transition-colors duration-500"
-            >
-              Womens
-            </Link>
-            <Link
-              href="/collections"
-              className="text-white/50 hover:text-white transition-colors duration-500"
-            >
-              Collections
+              Collection
             </Link>
           </div>
 
@@ -56,7 +46,7 @@ const Navbar: React.FC = () => {
             >
               Cart
               <span className="w-4 h-4 rounded-full border border-white/15 flex items-center justify-center text-[9px] text-white/30">
-                0
+                {totalItems}
               </span>
             </Link>
           </div>
@@ -82,22 +72,10 @@ const Navbar: React.FC = () => {
           <div className="md:hidden pb-8 pt-4">
             <div className="flex flex-col gap-6 text-[11px] font-light tracking-[0.15em] uppercase">
               <Link
-                href="/mens"
+                href="/collection"
                 className="text-white/50 hover:text-white transition-colors"
               >
-                Mens
-              </Link>
-              <Link
-                href="/womens"
-                className="text-white/50 hover:text-white transition-colors"
-              >
-                Womens
-              </Link>
-              <Link
-                href="/collections"
-                className="text-white/50 hover:text-white transition-colors"
-              >
-                Collections
+                Collection
               </Link>
               <Link
                 href="/contact"
@@ -109,7 +87,7 @@ const Navbar: React.FC = () => {
                 href="/cart"
                 className="text-white/50 hover:text-white transition-colors"
               >
-                Cart
+                Cart ({totalItems})
               </Link>
             </div>
           </div>
