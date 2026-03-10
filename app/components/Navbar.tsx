@@ -1,15 +1,28 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useCart } from "../CartContext";
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { totalItems } = useCart();
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 30);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50">
+    <nav
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        scrolled
+          ? "bg-black/40 backdrop-blur-md border-b border-white/[0.04]"
+          : ""
+      }`}
+    >
       <div className="max-w-[1400px] mx-auto px-6 lg:px-10">
         <div className="flex justify-between items-center h-20">
           {/* Left */}
@@ -73,18 +86,21 @@ const Navbar: React.FC = () => {
             <div className="flex flex-col gap-6 text-[11px] font-light tracking-[0.15em] uppercase">
               <Link
                 href="/collection"
+                onClick={() => setIsOpen(false)}
                 className="text-white/50 hover:text-white transition-colors"
               >
                 Collection
               </Link>
               <Link
                 href="/contact"
+                onClick={() => setIsOpen(false)}
                 className="text-white/50 hover:text-white transition-colors"
               >
                 Contact
               </Link>
               <Link
                 href="/cart"
+                onClick={() => setIsOpen(false)}
                 className="text-white/50 hover:text-white transition-colors"
               >
                 Cart ({totalItems})

@@ -342,7 +342,10 @@ export default function Page() {
               {/* Label — desktop only */}
               <div className="hidden md:flex absolute bottom-8 right-10 flex-col items-end gap-0.5">
                 {slide.label.map((line, j) => (
-                  <span key={j} className="text-[9px] font-bold tracking-[0.3em] uppercase text-white/10">
+                  <span
+                    key={j}
+                    className="text-[9px] font-bold tracking-[0.3em] uppercase text-white/10"
+                  >
                     {line}
                   </span>
                 ))}
