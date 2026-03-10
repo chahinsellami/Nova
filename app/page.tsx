@@ -264,86 +264,96 @@ export default function Page() {
           ref={(el) => {
             slideRefs.current[i] = el;
           }}
-          className="absolute inset-0 z-10 flex items-center"
+          className="absolute inset-0 z-10 flex items-center justify-center"
         >
-          {/* Product image */}
-          <div className="slide-img absolute overflow-hidden left-[50%] -translate-x-1/2 top-[14%] w-[55%] h-[45%] md:translate-x-0 md:left-[8%] md:top-[12%] md:w-[30%] md:h-[72%] will-change-transform">
-            <Image
-              src={slide.product}
-              alt={slide.name}
-              fill
-              sizes="(max-width: 768px) 55vw, 30vw"
-              priority={i === 0}
-              loading={i === 0 ? "eager" : "lazy"}
-              className="object-cover"
-              draggable={false}
-            />
-            <div
-              className="absolute inset-0"
-              style={{
-                background:
-                  "linear-gradient(to top, rgba(0,0,0,0.4), transparent 40%)",
-              }}
-            />
-          </div>
-
-          {/* Product info + Buy */}
-          <div className="absolute z-20 left-[50%] -translate-x-1/2 bottom-[6%] text-center md:text-left md:translate-x-0 md:left-[46%] md:top-[50%] md:bottom-auto md:-translate-y-1/2">
-            <div className="text-line overflow-hidden">
-              <div className="text-[8px] md:text-[9px] tracking-[0.5em] text-white/25 font-light uppercase mb-2 md:mb-4">
-                {slide.collection} &mdash; Limited Edition
-              </div>
-            </div>
-            <div className="text-line overflow-hidden">
-              <div className="text-xl sm:text-2xl lg:text-5xl font-extralight tracking-[0.1em] md:tracking-[0.15em] uppercase leading-tight">
-                {slide.name}
-              </div>
-            </div>
-            <div className="text-line overflow-hidden mt-2 md:mt-4">
-              <div className="text-xs md:text-sm lg:text-base font-light text-white/40 tracking-[0.2em]">
-                {slide.price}
-              </div>
-            </div>
-            <div className="text-line overflow-hidden mt-4 md:mt-10 flex gap-3 md:gap-4 justify-center md:justify-start">
-              <div>
-                <Link
-                  href="/collection"
-                  className="inline-block bg-white text-black px-6 md:px-10 py-2.5 md:py-3.5 text-[8px] md:text-[9px] tracking-[0.4em] font-medium uppercase hover:bg-white/90 transition-colors duration-300"
-                >
-                  Buy Now
-                </Link>
-              </div>
-            </div>
-            <div className="text-line overflow-hidden mt-3 md:mt-4">
-              <div>
-                <Link
-                  href="/collection"
-                  className="inline-block border border-white/15 px-6 md:px-10 py-2.5 md:py-3.5 text-[8px] md:text-[9px] tracking-[0.4em] font-light uppercase text-white/50 hover:border-white/40 hover:text-white transition-all duration-500"
-                >
-                  View Details
-                </Link>
-              </div>
-            </div>
-          </div>
-
-          {/* Vertical label — bottom right */}
+          {/* ── Card ── */}
           <div
-            className="absolute right-4 md:right-6 bottom-20 md:bottom-16 z-20 hidden md:block"
-            style={{ writingMode: "vertical-rl" }}
+            className="relative overflow-hidden
+              w-[88%] max-w-[380px] rounded-2xl
+              md:max-w-none md:w-[72%] lg:w-[62%] xl:w-[56%] md:rounded-3xl
+              bg-white/[0.03] backdrop-blur-sm border border-white/[0.07]
+              shadow-2xl shadow-black/50
+              flex flex-col md:flex-row md:h-[72vh] md:max-h-[620px]"
           >
-            {slide.label.map((line, j) => (
-              <div key={j} className="text-line overflow-hidden">
-                <div className="text-[11px] font-bold tracking-[0.25em] uppercase leading-snug">
-                  {line}
+            {/* Image section */}
+            <div className="slide-img relative w-full aspect-[4/5] md:aspect-auto md:w-[48%] md:h-full shrink-0 overflow-hidden will-change-transform">
+              <Image
+                src={slide.product}
+                alt={slide.name}
+                fill
+                sizes="(max-width: 768px) 88vw, 34vw"
+                priority={i === 0}
+                loading={i === 0 ? "eager" : "lazy"}
+                className="object-cover"
+                draggable={false}
+              />
+            </div>
+
+            {/* Info section */}
+            <div className="flex flex-col justify-center p-5 pt-4 pb-6 md:p-10 lg:p-14 flex-1 relative">
+              {/* Accent line */}
+              <div className="text-line overflow-hidden mb-3 md:mb-6">
+                <div className="w-8 md:w-12 h-px bg-white/20" />
+              </div>
+
+              <div className="text-line overflow-hidden">
+                <div className="text-[7px] md:text-[10px] tracking-[0.5em] text-white/30 font-light uppercase mb-1.5 md:mb-3">
+                  {slide.collection} &mdash; Limited Edition
                 </div>
               </div>
-            ))}
+
+              <div className="text-line overflow-hidden">
+                <div className="text-sm md:text-2xl lg:text-3xl font-extralight tracking-wide md:tracking-[0.12em] uppercase leading-tight">
+                  {slide.name}
+                </div>
+              </div>
+
+              <div className="text-line overflow-hidden mt-1.5 md:mt-4">
+                <div className="text-[11px] md:text-base font-light text-white/40 tracking-[0.2em] md:tracking-[0.25em]">
+                  {slide.price}
+                </div>
+              </div>
+
+              {/* Separator */}
+              <div className="text-line overflow-hidden mt-4 md:mt-8">
+                <div className="w-full h-px bg-white/[0.06]" />
+              </div>
+
+              {/* Buttons */}
+              <div className="text-line overflow-hidden mt-4 md:mt-8 flex gap-3 md:gap-4">
+                <div>
+                  <Link
+                    href="/collection"
+                    className="inline-block bg-white text-black px-5 py-2 md:px-10 md:py-3.5 text-[7px] md:text-[10px] tracking-[0.4em] font-medium uppercase hover:bg-white/90 transition-colors duration-300"
+                  >
+                    Buy Now
+                  </Link>
+                </div>
+                <div>
+                  <Link
+                    href="/collection"
+                    className="inline-block border border-white/15 px-4 py-2 md:px-8 md:py-3.5 text-[7px] md:text-[10px] tracking-[0.3em] md:tracking-[0.4em] font-light uppercase text-white/45 hover:border-white/30 hover:text-white transition-all duration-500"
+                  >
+                    Details
+                  </Link>
+                </div>
+              </div>
+
+              {/* Label — desktop only */}
+              <div className="hidden md:flex absolute bottom-8 right-10 flex-col items-end gap-0.5">
+                {slide.label.map((line, j) => (
+                  <span key={j} className="text-[9px] font-bold tracking-[0.3em] uppercase text-white/10">
+                    {line}
+                  </span>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       ))}
 
       {/* Bullet indicators — right side */}
-      <div className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-30 flex flex-col gap-4 md:gap-6">
+      <div className="absolute right-4 md:right-10 top-1/2 -translate-y-1/2 z-30 flex flex-col gap-4 md:gap-5">
         {SLIDES.map((_, i) => (
           <div
             key={i}
@@ -352,8 +362,8 @@ export default function Page() {
             }}
             className="flex items-center gap-3"
           >
-            <span className="bullet-line block w-6 h-px bg-white origin-left" />
-            <span className="bullet-text text-[10px] font-light tracking-wider">
+            <span className="bullet-line block w-6 md:w-8 h-px bg-white origin-left" />
+            <span className="bullet-text text-[10px] md:text-[11px] font-light tracking-widest">
               {String(i + 1).padStart(2, "0")}
             </span>
           </div>
@@ -363,16 +373,16 @@ export default function Page() {
       {/* Scroll hint */}
       <div
         ref={scrollHintRef}
-        className="absolute bottom-3 md:bottom-8 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-2"
+        className="absolute bottom-3 md:bottom-10 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-2"
       >
-        <span className="text-[9px] tracking-[0.4em] text-white/30 uppercase">
+        <span className="text-[9px] tracking-[0.5em] text-white/25 uppercase font-light">
           Scroll
         </span>
         <div
-          className="w-px h-8"
+          className="w-px h-10"
           style={{
             background:
-              "linear-gradient(to bottom, rgba(255,255,255,0.2), transparent)",
+              "linear-gradient(to bottom, rgba(255,255,255,0.15), transparent)",
           }}
         />
       </div>
