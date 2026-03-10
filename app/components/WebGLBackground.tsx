@@ -23,9 +23,15 @@ uniform sampler2D disp;
 
 uniform float dispPower;
 uniform float intensity;
+uniform vec2 mouse;
 
 void main() {
   vec2 uv = vUv;
+
+  // Subtle mouse-driven distortion
+  float dist = distance(uv, mouse);
+  float mouseEffect = smoothstep(0.4, 0.0, dist) * 0.015;
+  uv += mouseEffect * (uv - mouse);
 
   vec4 d = texture2D(disp, uv);
   vec2 dispVec = vec2(d.x, d.y);
@@ -74,8 +80,11 @@ export default function WebGLBackground({
 
     /* ── Three.js setup ─────────────────────────────────── */
     const scene = new THREE.Scene();
-    const renderer = new THREE.WebGLRenderer({ alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    const renderer = new THREE.WebGLRenderer({
+      alpha: true,
+      powerPreference: "low-power",
+    });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     renderer.setSize(el.offsetWidth, el.offsetHeight);
     inner.appendChild(renderer.domElement);
 
@@ -111,6 +120,7 @@ export default function WebGLBackground({
       uniforms: {
         dispPower: { value: 0.0 },
         intensity: { value: 0.5 },
+        mouse: { value: new THREE.Vector2(0.5, 0.5) },
         res: {
           value: new THREE.Vector2(el.offsetWidth, el.offsetHeight),
         },
@@ -189,8 +199,43 @@ export default function WebGLBackground({
     };
     window.addEventListener("resize", onResize);
 
+    /* ── Mouse tracking for shader distortion ───────────── */
+    let targetMouse = { x: 0.5, y: 0.5 };
+    let currentMouse = { x: 0.5, y: 0.5 };
+    let mouseRaf: number;
+    let mouseSettled = true;
+
+    const onMouseMove = (e: MouseEvent) => {
+      targetMouse.x = e.clientX / window.innerWidth;
+      targetMouse.y = 1.0 - e.clientY / window.innerHeight;
+      mouseSettled = false;
+    };
+    window.addEventListener("mousemove", onMouseMove, { passive: true });
+
+    const animateMouse = () => {
+      const dx = targetMouse.x - currentMouse.x;
+      const dy = targetMouse.y - currentMouse.y;
+      const needsUpdate = Math.abs(dx) > 0.0005 || Math.abs(dy) > 0.0005;
+
+      if (needsUpdate) {
+        currentMouse.x += dx * 0.05;
+        currentMouse.y += dy * 0.05;
+        mat.uniforms.mouse.value.set(currentMouse.x, currentMouse.y);
+        if (!animating) render();
+        mouseSettled = false;
+      } else if (!mouseSettled) {
+        mouseSettled = true;
+        // One final render to settle
+        if (!animating) render();
+      }
+      mouseRaf = requestAnimationFrame(animateMouse);
+    };
+    mouseRaf = requestAnimationFrame(animateMouse);
+
     /* ── Cleanup ────────────────────────────────────────── */
     return () => {
+      cancelAnimationFrame(mouseRaf);
+      window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("resize", onResize);
       if (resizeTimer) clearTimeout(resizeTimer);
       renderer.dispose();

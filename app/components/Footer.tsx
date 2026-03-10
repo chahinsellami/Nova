@@ -3,107 +3,91 @@
 import React from "react";
 import Link from "next/link";
 
+const footerLinks = [
+  {
+    title: "Shop",
+    links: [
+      { label: "Collection", href: "/collection" },
+      { label: "New Arrivals", href: "/collection" },
+      { label: "Best Sellers", href: "/collection" },
+    ],
+  },
+  {
+    title: "Help",
+    links: [
+      { label: "Contact", href: "/contact" },
+      { label: "FAQ", href: "/faq" },
+      { label: "Shipping", href: "/shipping" },
+    ],
+  },
+  {
+    title: "Follow",
+    links: [
+      { label: "Instagram", href: "#" },
+      { label: "Twitter", href: "#" },
+      { label: "TikTok", href: "#" },
+    ],
+  },
+];
+
 const Footer: React.FC = () => {
   return (
-    <footer className="bg-black border-t border-white/[0.06] py-16 px-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+    <footer className="relative border-t border-white/[0.06] pt-16 pb-10 px-6 overflow-hidden">
+      {/* Subtle glow */}
+      <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-96 h-64 bg-white/[0.02] rounded-full blur-3xl pointer-events-none" />
+
+      <div className="max-w-5xl mx-auto relative">
+        <div className="flex flex-col md:flex-row justify-between gap-12 mb-16">
           {/* Brand */}
-          <div>
-            <h3 className="font-light text-[11px] tracking-[0.3em] uppercase mb-4">
+          <div className="md:max-w-[200px]">
+            <h3 className="text-lg font-extralight tracking-[0.4em] uppercase mb-3">
               NOVA
             </h3>
-            <p className="text-xs text-white/30 leading-relaxed">
-              Limited edition darkwear.
-              <br />
-              Premium essentials.
+            <p className="text-[10px] text-white/25 leading-relaxed tracking-wide">
+              Limited edition darkwear. Crafted for those who move in silence.
             </p>
           </div>
 
-          {/* Shop */}
-          <div>
-            <h4 className="font-light text-sm mb-4">Shop</h4>
-            <ul className="space-y-2 text-xs text-gray-400">
-              <li>
-                <Link
-                  href="/collection"
-                  className="hover:text-white transition"
-                >
-                  Mens
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/collection"
-                  className="hover:text-white transition"
-                >
-                  Womens
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/collection"
-                  className="hover:text-white transition"
-                >
-                  Collections
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Support */}
-          <div>
-            <h4 className="font-light text-sm mb-4">Support</h4>
-            <ul className="space-y-2 text-xs text-gray-400">
-              <li>
-                <Link href="/contact" className="hover:text-white transition">
-                  Contact
-                </Link>
-              </li>
-              <li>
-                <Link href="/faq" className="hover:text-white transition">
-                  FAQ
-                </Link>
-              </li>
-              <li>
-                <Link href="/shipping" className="hover:text-white transition">
-                  Shipping
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Social */}
-          <div>
-            <h4 className="font-light text-sm mb-4">Follow</h4>
-            <ul className="space-y-2 text-xs text-gray-400">
-              <li>
-                <a href="#" className="hover:text-white transition">
-                  Instagram
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white transition">
-                  Twitter
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white transition">
-                  Facebook
-                </a>
-              </li>
-            </ul>
+          {/* Link columns */}
+          <div className="flex gap-16 md:gap-20">
+            {footerLinks.map((col) => (
+              <div key={col.title}>
+                <h4 className="text-[9px] tracking-[0.4em] uppercase text-white/30 font-light mb-4">
+                  {col.title}
+                </h4>
+                <ul className="space-y-2.5">
+                  {col.links.map((link) => (
+                    <li key={link.label}>
+                      <Link
+                        href={link.href}
+                        className="text-[11px] text-white/40 hover:text-white transition-colors duration-300"
+                      >
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
         </div>
 
         {/* Bottom */}
-        <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-gray-400">
-          <p>&copy; 2026 NOVA. All rights reserved.</p>
-          <div className="flex gap-6 mt-4 md:mt-0">
-            <Link href="/privacy" className="hover:text-white transition">
+        <div className="border-t border-white/[0.05] pt-6 flex flex-col md:flex-row justify-between items-center gap-3">
+          <p className="text-[9px] text-white/15 tracking-wider">
+            &copy; 2026 NOVA. All rights reserved.
+          </p>
+          <div className="flex gap-6">
+            <Link
+              href="/privacy"
+              className="text-[9px] text-white/15 hover:text-white/40 tracking-wider transition-colors"
+            >
               Privacy
             </Link>
-            <Link href="/terms" className="hover:text-white transition">
+            <Link
+              href="/terms"
+              className="text-[9px] text-white/15 hover:text-white/40 tracking-wider transition-colors"
+            >
               Terms
             </Link>
           </div>

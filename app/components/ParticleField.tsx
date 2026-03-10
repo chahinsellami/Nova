@@ -6,6 +6,7 @@ import * as THREE from "three";
 /**
  * Floating dust-like particles rendered with Three.js.
  * Reacts subtly to mouse movement for depth.
+ * Throttled to ~30fps and pauses when tab is hidden.
  */
 export default function ParticleField() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -14,6 +15,9 @@ export default function ParticleField() {
     const el = containerRef.current;
     if (!el) return;
 
+    // Skip on very small screens / low-end
+    const isMobile = window.innerWidth < 768;
+
     const w = el.offsetWidth;
     const h = el.offsetHeight;
 
@@ -21,13 +25,21 @@ export default function ParticleField() {
     const camera = new THREE.PerspectiveCamera(60, w / h, 0.1, 1000);
     camera.position.z = 300;
 
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+    const renderer = new THREE.WebGLRenderer({
+      alpha: true,
+      antialias: false,
+      powerPreference: "low-power",
+    });
+    renderer.setPixelRatio(
+      Math.min(window.devicePixelRatio, isMobile ? 1 : 1.5),
+    );
     renderer.setSize(w, h);
     el.appendChild(renderer.domElement);
 
-    // Particles
-    const count = Math.min(120, Math.floor((w * h) / 8000));
+    // Fewer particles on mobile
+    const count = isMobile
+      ? Math.min(30, Math.floor((w * h) / 20000))
+      : Math.min(60, Math.floor((w * h) / 12000));
     const positions = new Float32Array(count * 3);
     const velocities = new Float32Array(count * 3);
 
@@ -62,12 +74,23 @@ export default function ParticleField() {
       mouseX = (e.clientX / w - 0.5) * 2;
       mouseY = (e.clientY / h - 0.5) * 2;
     };
-    window.addEventListener("mousemove", onMouseMove);
+    if (!isMobile) {
+      window.addEventListener("mousemove", onMouseMove, { passive: true });
+    }
 
-    // Animation loop
+    // Throttled animation loop (~30fps)
     let raf: number;
-    const animate = () => {
+    let paused = false;
+    let lastFrame = 0;
+    const FRAME_INTERVAL = 1000 / 30; // ~30fps
+
+    const animate = (now: number) => {
       raf = requestAnimationFrame(animate);
+      if (paused) return;
+
+      const delta = now - lastFrame;
+      if (delta < FRAME_INTERVAL) return;
+      lastFrame = now - (delta % FRAME_INTERVAL);
 
       const posAttr = geometry.attributes.position as THREE.BufferAttribute;
       const arr = posAttr.array as Float32Array;
@@ -91,7 +114,13 @@ export default function ParticleField() {
 
       renderer.render(scene, camera);
     };
-    animate();
+    raf = requestAnimationFrame(animate);
+
+    // Pause when tab is hidden
+    const onVisibility = () => {
+      paused = document.hidden;
+    };
+    document.addEventListener("visibilitychange", onVisibility);
 
     // Resize
     let resizeTimer: ReturnType<typeof setTimeout> | null = null;
@@ -112,6 +141,7 @@ export default function ParticleField() {
       cancelAnimationFrame(raf);
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("resize", onResize);
+      document.removeEventListener("visibilitychange", onVisibility);
       if (resizeTimer) clearTimeout(resizeTimer);
       renderer.dispose();
       geometry.dispose();

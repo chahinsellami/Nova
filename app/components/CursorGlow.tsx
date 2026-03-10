@@ -25,20 +25,29 @@ export default function CursorGlow() {
     let cx = -200;
     let cy = -200;
     let raf: number;
+    let settled = true;
 
     const onMove = (e: MouseEvent) => {
       x = e.clientX;
       y = e.clientY;
+      settled = false;
     };
 
     const lerp = () => {
-      cx += (x - cx) * 0.08;
-      cy += (y - cy) * 0.08;
-      el.style.transform = `translate(${cx - 200}px, ${cy - 200}px)`;
+      const dx = x - cx;
+      const dy = y - cy;
+      if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) {
+        cx += dx * 0.08;
+        cy += dy * 0.08;
+        el.style.transform = `translate3d(${cx - 200}px, ${cy - 200}px, 0)`;
+        settled = false;
+      } else if (!settled) {
+        settled = true;
+      }
       raf = requestAnimationFrame(lerp);
     };
 
-    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mousemove", onMove, { passive: true });
     raf = requestAnimationFrame(lerp);
 
     return () => {

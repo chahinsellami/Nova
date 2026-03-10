@@ -16,13 +16,41 @@
 }
 
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto; /* Lenis handles smooth scroll */
   text-rendering: optimizeSpeed;
 }
 
 body {
   background: #000;
   color: #fff;
+}
+
+/* ── Reduced motion support ── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Content visibility for off-screen sections ── */
+section {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 600px;
+}
+
+/* ── GPU-accelerated fixed layers ── */
+.fixed {
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+canvas {
+  will-change: contents;
 }
 
 /* Smooth link hover underline effect */
@@ -55,4 +83,13 @@ img {
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.15);
+}
+
+@keyframes fadeInHint {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }

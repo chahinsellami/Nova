@@ -15,12 +15,16 @@ interface CartContextType {
   addToCart: (item: Omit<CartItem, "qty">) => void;
   removeFromCart: (id: string) => void;
   totalItems: number;
+  isCartOpen: boolean;
+  openCart: () => void;
+  closeCart: () => void;
 }
 
 const CartContext = createContext<CartContextType | null>(null);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   const addToCart = useCallback((item: Omit<CartItem, "qty">) => {
     setItems((prev) => {
@@ -38,11 +42,22 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setItems((prev) => prev.filter((i) => i.id !== id));
   }, []);
 
+  const openCart = useCallback(() => setIsCartOpen(true), []);
+  const closeCart = useCallback(() => setIsCartOpen(false), []);
+
   const totalItems = items.reduce((sum, i) => sum + i.qty, 0);
 
   return (
     <CartContext.Provider
-      value={{ items, addToCart, removeFromCart, totalItems }}
+      value={{
+        items,
+        addToCart,
+        removeFromCart,
+        totalItems,
+        isCartOpen,
+        openCart,
+        closeCart,
+      }}
     >
       {children}
     </CartContext.Provider>
