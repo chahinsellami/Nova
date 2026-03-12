@@ -1061,6 +1061,33 @@ export default function VisualSlider() {
 
       {/* Click hint */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none opacity-0 animate-[fadeInHint_1s_2s_forwards]"></div>
+
+      {/* Brand Statement Overlay (moved here from page) */}
+      <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
+        <div className="brand-card backdrop-blur-sm bg-black/30 rounded-xl px-8 py-10 md:px-16 md:py-14 flex flex-col items-center shadow-2xl shadow-black/40">
+          <span
+            className="mb-4 text-[10px] md:text-xs tracking-[0.8em] text-white/40 uppercase font-light"
+            style={{ letterSpacing: "0.4em" }}
+          >
+            Established 2024
+          </span>
+
+          <h2 className="mt-6 text-3xl md:text-5xl lg:text-6xl font-extralight tracking-wide leading-tight text-center">
+            Where darkness meets
+            <br />
+            <span className="text-white/60">elegance</span>
+          </h2>
+
+          <p className="mt-8 text-base md:text-lg font-light text-white/60 text-center max-w-2xl">
+            NOVA crafts garments that exist at the intersection of shadow and
+            sophistication. Each piece is designed to move with you —
+            constructed with premium materials and an uncompromising attention
+            to detail.
+          </p>
+
+          <div className="mt-8 w-24 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+        </div>
+      </div>
     </div>
   );
 }

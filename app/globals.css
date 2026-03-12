@@ -5,6 +5,14 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* Theme variables (RGB components) — Tailwind maps `white`/`black` to these via tailwind.config.cjs */
+:root {
+  --color-text-rgb: 255 255 255; /* light text on dark background (dark mode) */
+  --color-bg-rgb: 0 0 0; /* page background (dark mode) */
+  --color-muted-rgb: 255 255 255; /* used for subtle overlays if needed */
+  --color-border-rgb: 255 255 255;
+}
+
 * {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -20,9 +28,93 @@ html {
   text-rendering: optimizeSpeed;
 }
 
+/* Use the CSS variables for base page colors */
 body {
-  background: #000;
-  color: #fff;
+  background: rgb(var(--color-bg-rgb));
+  color: rgb(var(--color-text-rgb));
+}
+
+/* -----------------------------
+   Light mode overrides
+   Use html[data-theme="light"] to enable white mode
+   ----------------------------- */
+/* Light theme swaps the RGB variables */
+html[data-theme="light"] {
+  --color-text-rgb: 17 17 17; /* dark text */
+  --color-bg-rgb: 255 255 255; /* white background */
+  --color-muted-rgb: 0 0 0;
+  --color-border-rgb: 0 0 0;
+}
+
+html[data-theme="light"] body {
+  background: rgb(var(--color-bg-rgb));
+  color: rgb(var(--color-text-rgb));
+}
+
+/* Make the main nav and common white text utility readable in light mode */
+html[data-theme="light"] nav,
+html[data-theme="light"] .brand-card {
+  background: transparent;
+}
+
+/* Override common text-white utilities (escape slash variants) */
+html[data-theme="light"] .text-white,
+html[data-theme="light"] .text-white\/60,
+html[data-theme="light"] .text-white\/50,
+html[data-theme="light"] .text-white\/40,
+html[data-theme="light"] .text-white\/30,
+html[data-theme="light"] .text-white\/20,
+html[data-theme="light"] .text-white\/15,
+html[data-theme="light"] .text-white\/10 {
+  color: #111 !important;
+}
+
+/* Progress fills and navigation accents */
+html[data-theme="light"] .vs-navigation .vs-progress-fill {
+  background: rgba(0, 0, 0, 0.7) !important;
+}
+
+/* Brand card in light mode */
+html[data-theme="light"] .brand-card {
+  /* Make it glassy and more transparent like dark mode's bg-black/30 */
+  background: rgba(255, 255, 255, 0.6) !important;
+  color: #111 !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Make subtle borders visible */
+html[data-theme="light"] .border-white\/20 {
+  border-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Broad fallbacks for Tailwind utility classes that use text-white/bg-black/border-white
+   Many components use opacity variants like text-white/[0.02] which are hard to enumerate.
+   These attribute selectors match class names containing the utility and apply readable
+   light-theme equivalents. Use sparingly and keep specificity high with !important. */
+html[data-theme="light"] [class*="text-white"] {
+  color: #111 !important;
+}
+
+html[data-theme="light"] [class*="bg-black"] {
+  background-color: rgba(255, 255, 255, 0.92) !important;
+}
+
+html[data-theme="light"] [class*="border-white"] {
+  border-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+/* When the site is in light mode but the navbar sits over dark content
+   (top of the page), force the nav text to white so it remains visible. */
+nav.nav--light-top [class*="text-white"] {
+  color: #fff !important;
+}
+
+/* Mobile burger lines */
+nav.nav--light-top [class*="md:hidden"] span {
+  background-color: #fff !important;
 }
 
 /* ── Reduced motion support ── */

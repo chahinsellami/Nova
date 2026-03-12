@@ -161,6 +161,11 @@ function SearchOverlay({
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [theme, setTheme] = useState<string>(() =>
+    typeof window !== "undefined"
+      ? localStorage.getItem("site-theme") || "dark"
+      : "dark",
+  );
   const { totalItems, openCart } = useCart();
   const [scrolled, setScrolled] = useState(false);
 
@@ -170,156 +175,197 @@ const Navbar: React.FC = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const root = document.documentElement;
+    if (theme === "light") {
+      root.setAttribute("data-theme", "light");
+    } else {
+      root.removeAttribute("data-theme");
+    }
+    localStorage.setItem("site-theme", theme);
+  }, [theme]);
+
   return (
     <>
-    <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled
-          ? "bg-black/40 backdrop-blur-md border-b border-white/[0.04]"
-          : ""
-      }`}
-    >
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-10">
-        <div className="flex justify-between items-center h-20">
-          {/* Left */}
-          <div className="hidden md:flex gap-10 text-[11px] font-light tracking-[0.15em] uppercase">
-            <Link
-              href="/collection"
-              className="text-white/50 hover:text-white transition-colors duration-500"
-            >
-              Collection
-            </Link>
-          </div>
-
-          {/* Logo */}
-          <Link
-            href="/"
-            className="absolute left-1/2 transform -translate-x-1/2"
-          >
-            <span className="text-[13px] font-light tracking-[0.35em] uppercase">
-              NOVA
-            </span>
-          </Link>
-
-          {/* Right */}
-          <div className="hidden md:flex gap-10 text-[11px] font-light tracking-[0.15em] uppercase items-center ml-auto">
-            <Link
-              href="/contact"
-              className="text-white/50 hover:text-white transition-colors duration-500"
-            >
-              Contact
-            </Link>
-            <button
-              onClick={() => setSearchOpen(true)}
-              className="text-white/50 hover:text-white transition-colors duration-500"
-              aria-label="Search"
-            >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={1.5}
+      <nav
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+          scrolled
+            ? "bg-black/40 backdrop-blur-md border-b border-white/[0.04]"
+            : ""
+        } ${theme === "light" && !scrolled ? "nav--light-top" : ""}`}
+      >
+        <div className="max-w-[1400px] mx-auto px-6 lg:px-10">
+          <div className="flex justify-between items-center h-20">
+            {/* Left */}
+            <div className="hidden md:flex gap-10 text-[11px] font-light tracking-[0.15em] uppercase">
+              <Link
+                href="/collection"
+                className="text-white/50 hover:text-white transition-colors duration-500"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-                />
-              </svg>
-            </button>
-            <button
-              onClick={openCart}
-              className="text-white/50 hover:text-white transition-colors duration-500 flex items-center gap-2"
+                Collection
+              </Link>
+            </div>
+
+            {/* Logo */}
+            <Link
+              href="/"
+              className="absolute left-1/2 transform -translate-x-1/2"
             >
-              Cart
-              <span className="w-4 h-4 rounded-full border border-white/15 flex items-center justify-center text-[9px] text-white/30">
-                {totalItems}
+              <span className="text-[13px] font-light tracking-[0.35em] uppercase">
+                NOVA
               </span>
+            </Link>
+
+            {/* Right */}
+            <div className="hidden md:flex gap-10 text-[11px] font-light tracking-[0.15em] uppercase items-center ml-auto">
+              <Link
+                href="/contact"
+                className="text-white/50 hover:text-white transition-colors duration-500"
+              >
+                Contact
+              </Link>
+              {/* Theme toggle */}
+              <button
+                onClick={() =>
+                  setTheme((t) => (t === "light" ? "dark" : "light"))
+                }
+                className="text-white/50 hover:text-white transition-colors duration-500 p-1"
+                aria-label="Toggle theme"
+              >
+                {theme === "light" ? (
+                  <svg
+                    className="w-4 h-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={1.5}
+                  >
+                    <path d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" />
+                  </svg>
+                ) : (
+                  <svg
+                    className="w-4 h-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={1.5}
+                  >
+                    <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
+                  </svg>
+                )}
+              </button>
+              <button
+                onClick={() => setSearchOpen(true)}
+                className="text-white/50 hover:text-white transition-colors duration-500"
+                aria-label="Search"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                  />
+                </svg>
+              </button>
+              <button
+                onClick={openCart}
+                className="text-white/50 hover:text-white transition-colors duration-500 flex items-center gap-2"
+              >
+                Cart
+                <span className="w-4 h-4 rounded-full border border-white/15 flex items-center justify-center text-[9px] text-white/30">
+                  {totalItems}
+                </span>
+              </button>
+            </div>
+
+            {/* Mobile */}
+            <button
+              className="md:hidden ml-auto p-2"
+              onClick={() => setIsOpen(!isOpen)}
+            >
+              <div className="flex flex-col gap-1.5">
+                <span
+                  className={`block w-5 h-px bg-white transition-all duration-300 ${isOpen ? "rotate-45 translate-y-[3.5px]" : ""}`}
+                />
+                <span
+                  className={`block w-5 h-px bg-white transition-all duration-300 ${isOpen ? "-rotate-45 -translate-y-[3.5px]" : ""}`}
+                />
+              </div>
             </button>
           </div>
 
-          {/* Mobile */}
-          <button
-            className="md:hidden ml-auto p-2"
-            onClick={() => setIsOpen(!isOpen)}
+          {/* Mobile Menu — full screen overlay */}
+          <div
+            className={`md:hidden fixed inset-0 bg-black/80 backdrop-blur-xl z-40 flex flex-col items-center justify-center gap-8 transition-all duration-500 ${
+              isOpen
+                ? "opacity-100 pointer-events-auto"
+                : "opacity-0 pointer-events-none"
+            }`}
           >
-            <div className="flex flex-col gap-1.5">
-              <span
-                className={`block w-5 h-px bg-white transition-all duration-300 ${isOpen ? "rotate-45 translate-y-[3.5px]" : ""}`}
-              />
-              <span
-                className={`block w-5 h-px bg-white transition-all duration-300 ${isOpen ? "-rotate-45 -translate-y-[3.5px]" : ""}`}
-              />
-            </div>
-          </button>
-        </div>
-
-        {/* Mobile Menu — full screen overlay */}
-        <div
-          className={`md:hidden fixed inset-0 bg-black/80 backdrop-blur-xl z-40 flex flex-col items-center justify-center gap-8 transition-all duration-500 ${
-            isOpen
-              ? "opacity-100 pointer-events-auto"
-              : "opacity-0 pointer-events-none"
-          }`}
-        >
-          {[
-            { href: "/", label: "Home" },
-            { href: "/collection", label: "Collection" },
-            { href: "/contact", label: "Contact" },
-          ].map((item, i) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={() => setIsOpen(false)}
+            {[
+              { href: "/", label: "Home" },
+              { href: "/collection", label: "Collection" },
+              { href: "/contact", label: "Contact" },
+            ].map((item, i) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setIsOpen(false)}
+                className="text-xl font-extralight tracking-[0.3em] uppercase text-white/70 hover:text-white transition-all duration-300"
+                style={{
+                  transitionDelay: isOpen ? `${i * 60}ms` : "0ms",
+                  transform: isOpen ? "translateY(0)" : "translateY(20px)",
+                  opacity: isOpen ? 1 : 0,
+                }}
+              >
+                {item.label}
+              </Link>
+            ))}
+            <button
+              onClick={() => {
+                setIsOpen(false);
+                setTimeout(() => openCart(), 200);
+              }}
               className="text-xl font-extralight tracking-[0.3em] uppercase text-white/70 hover:text-white transition-all duration-300"
               style={{
-                transitionDelay: isOpen ? `${i * 60}ms` : "0ms",
+                transitionDelay: isOpen ? "180ms" : "0ms",
                 transform: isOpen ? "translateY(0)" : "translateY(20px)",
                 opacity: isOpen ? 1 : 0,
               }}
             >
-              {item.label}
-            </Link>
-          ))}
-          <button
-            onClick={() => {
-              setIsOpen(false);
-              setTimeout(() => openCart(), 200);
-            }}
-            className="text-xl font-extralight tracking-[0.3em] uppercase text-white/70 hover:text-white transition-all duration-300"
-            style={{
-              transitionDelay: isOpen ? "180ms" : "0ms",
-              transform: isOpen ? "translateY(0)" : "translateY(20px)",
-              opacity: isOpen ? 1 : 0,
-            }}
-          >
-            {`Cart (${totalItems})`}
-          </button>
-          <button
-            onClick={() => {
-              setIsOpen(false);
-              setTimeout(() => setSearchOpen(true), 200);
-            }}
-            className="text-xl font-extralight tracking-[0.3em] uppercase text-white/70 hover:text-white transition-all duration-300"
-            style={{
-              transitionDelay: isOpen ? "240ms" : "0ms",
-              transform: isOpen ? "translateY(0)" : "translateY(20px)",
-              opacity: isOpen ? 1 : 0,
-            }}
-          >
-            Search
-          </button>
-          <div className="absolute bottom-12 flex flex-col items-center gap-2">
-            <div className="w-8 h-px bg-white/10" />
-            <span className="text-[8px] tracking-[0.5em] text-white/20 uppercase">
-              NOVA &copy; 2026
-            </span>
+              {`Cart (${totalItems})`}
+            </button>
+            <button
+              onClick={() => {
+                setIsOpen(false);
+                setTimeout(() => setSearchOpen(true), 200);
+              }}
+              className="text-xl font-extralight tracking-[0.3em] uppercase text-white/70 hover:text-white transition-all duration-300"
+              style={{
+                transitionDelay: isOpen ? "240ms" : "0ms",
+                transform: isOpen ? "translateY(0)" : "translateY(20px)",
+                opacity: isOpen ? 1 : 0,
+              }}
+            >
+              Search
+            </button>
+            <div className="absolute bottom-12 flex flex-col items-center gap-2">
+              <div className="w-8 h-px bg-white/10" />
+              <span className="text-[8px] tracking-[0.5em] text-white/20 uppercase">
+                NOVA &copy; 2026
+              </span>
+            </div>
           </div>
         </div>
-      </div>
-    </nav>
-    <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
+      </nav>
+      <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
     </>
   );
 };

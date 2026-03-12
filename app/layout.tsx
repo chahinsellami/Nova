@@ -33,7 +33,7 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://s3-us-west-2.amazonaws.com" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black text-white`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ClientLayout>{children}</ClientLayout>
       </body>

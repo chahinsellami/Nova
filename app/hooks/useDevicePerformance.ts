@@ -107,18 +107,23 @@ function getSnapshot(): PerfProfile {
 }
 
 function getServerSnapshot(): PerfProfile {
-  return {
-    tier: "high",
-    isMobile: false,
-    isTouch: false,
-    pixelRatioCap: 2,
-    particleCount: 80,
-    enableMouseTracking: true,
-    enableParticles: true,
-    enableCursorGlow: true,
-    prefersReducedMotion: false,
-  };
+  return SERVER_SNAPSHOT;
 }
+
+// Cache a stable server snapshot object to avoid returning a new reference
+// on every call (prevents infinite loop warnings from React's
+// useSyncExternalStore during SSR hydration).
+const SERVER_SNAPSHOT: PerfProfile = {
+  tier: "high",
+  isMobile: false,
+  isTouch: false,
+  pixelRatioCap: 2,
+  particleCount: 80,
+  enableMouseTracking: true,
+  enableParticles: true,
+  enableCursorGlow: true,
+  prefersReducedMotion: false,
+};
 
 export default function useDevicePerformance(): PerfProfile {
   return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);

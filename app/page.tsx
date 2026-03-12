@@ -643,7 +643,7 @@ export default function Page() {
           </svg>
         </div>
       </div>
-      <BrandStatement />
+      {/* BrandStatement moved into the slider component */}
       <FeaturedProducts />
       <Marquee />
       <EditorialSplit />
