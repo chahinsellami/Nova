@@ -161,11 +161,6 @@ function SearchOverlay({
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [theme, setTheme] = useState<string>(() =>
-    typeof window !== "undefined"
-      ? localStorage.getItem("site-theme") || "dark"
-      : "dark",
-  );
   const { totalItems, openCart } = useCart();
   const [scrolled, setScrolled] = useState(false);
 
@@ -175,25 +170,14 @@ const Navbar: React.FC = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const root = document.documentElement;
-    if (theme === "light") {
-      root.setAttribute("data-theme", "light");
-    } else {
-      root.removeAttribute("data-theme");
-    }
-    localStorage.setItem("site-theme", theme);
-  }, [theme]);
+  // No theme handling — site is dark-only.
 
   return (
     <>
       <nav
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          scrolled
-            ? "bg-black/40 backdrop-blur-md border-b border-white/[0.04]"
-            : ""
-        } ${theme === "light" && !scrolled ? "nav--light-top" : ""}`}
+          scrolled ? "bg-black/40 backdrop-blur-md border-b border-white/[0.04]" : ""
+        }`}
       >
         <div className="max-w-[1400px] mx-auto px-6 lg:px-10">
           <div className="flex justify-between items-center h-20">
@@ -212,7 +196,7 @@ const Navbar: React.FC = () => {
               href="/"
               className="absolute left-1/2 transform -translate-x-1/2"
             >
-              <span className="text-[13px] font-light tracking-[0.35em] uppercase">
+              <span className="text-[13px] text-white font-light tracking-[0.35em] uppercase">
                 NOVA
               </span>
             </Link>
@@ -225,36 +209,7 @@ const Navbar: React.FC = () => {
               >
                 Contact
               </Link>
-              {/* Theme toggle */}
-              <button
-                onClick={() =>
-                  setTheme((t) => (t === "light" ? "dark" : "light"))
-                }
-                className="text-white/50 hover:text-white transition-colors duration-500 p-1"
-                aria-label="Toggle theme"
-              >
-                {theme === "light" ? (
-                  <svg
-                    className="w-4 h-4"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={1.5}
-                  >
-                    <path d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" />
-                  </svg>
-                ) : (
-                  <svg
-                    className="w-4 h-4"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={1.5}
-                  >
-                    <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
-                  </svg>
-                )}
-              </button>
+              {/* Theme removed — dark only. */}
               <button
                 onClick={() => setSearchOpen(true)}
                 className="text-white/50 hover:text-white transition-colors duration-500"
